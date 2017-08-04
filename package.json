@@ -1,0 +1,15 @@
+{
+  "name": "project-7-twitter",
+  "version": "1.0.0",
+  "description": "project 7",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Debbie O'Brien",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3",
+    "pug": "^2.0.0-rc.3"
+  }
+}
