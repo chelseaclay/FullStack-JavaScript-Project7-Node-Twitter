@@ -8,11 +8,12 @@
     "start": "node app.js"
   },
   "engines": {
-    "node":"6.11.1"
+    "node": "6.11.1"
   },
   "author": "Debbie O'Brien",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "pug": "^2.0.0-rc.3",
     "twit": "^2.2.9"
