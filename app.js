@@ -5,9 +5,11 @@ const config = require("./config");
 const moment = require('moment');
 
 
+
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
+app.locals.moment = require('moment');
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use('/static', express.static('css'));
@@ -28,6 +30,9 @@ let friends;
 let messages;
 let friendsCount = "";
 let profile_banner_url ="";
+let date = function(date){
+    moment(date).format("YYYY/MM/DD");
+};
 
 function loadTweets() {
     T.get("friends/list", { screen_name: userName, count: 5 }, function(
@@ -77,6 +82,7 @@ function loadTweets() {
             profileImage = data.profile_image_url;
             name = data.name;
             friendsCount = data.friends_count;
+            profile_banner_url = data.profile_banner_url;
             loadTweets();
 
         });
