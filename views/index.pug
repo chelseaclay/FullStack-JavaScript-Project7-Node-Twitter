@@ -1,9 +1,9 @@
 extends layout.pug
 block content
-        include footer.pug
+        include partials/footer
         .bounds.app--body
-            include header.pug
-            include timeline.pug
-            include friends.pug
-            include messages.pug
+            include partials/header.pug
+            include partials/timeline
+            include partials/friends
+            include partials/messages
 
