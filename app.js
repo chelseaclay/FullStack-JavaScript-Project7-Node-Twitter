@@ -27,6 +27,7 @@ let tweets;
 let friends;
 let messages;
 let friendsCount = "";
+let profile_banner_url ="";
 
 function loadTweets() {
     T.get("friends/list", { screen_name: userName, count: 5 }, function(
@@ -48,7 +49,7 @@ function loadTweets() {
             console.log(err);
         } else {
             messages = data;
-             console.log(data);
+             //console.log(data);
         }
     });
 
@@ -71,13 +72,11 @@ function loadTweets() {
             console.log('caught error', err.stack)
         })
         .then(function (result) {
-            let twitter = result.data;
-            userName = twitter.screen_name;
-            profileImage = twitter.profile_image_url;
-            name = twitter.name;
-            myTweet = twitter.text;
-            retweets = twitter.retweet_count;
-            friendsCount = twitter.friends_count;
+            let data = result.data;
+            userName = data.screen_name;
+            profileImage = data.profile_image_url;
+            name = data.name;
+            friendsCount = data.friends_count;
             loadTweets();
 
         });
@@ -97,14 +96,7 @@ io.on("connection", function(socket) {
 });
 
 
-app.get('/hello', (req, res) => {
-    res.render('card', {prompt: 'hello'});
-});
 
-app.post('/', (req, res) => {
-    //console.dir(req.body)
-    res.render('card', {prompt: 'hello'});
-});
 
 app.get('/', (req, res) => {
     res.render('index', {
@@ -115,8 +107,7 @@ app.get('/', (req, res) => {
         tweets: tweets,
         friends: friends,
         messages: messages,
-        retweets: retweets,
-        myTweet: myTweet
+        profile_banner_url: profile_banner_url
     });
 });
 
@@ -128,4 +119,6 @@ app.post('/', (req, res) => {
 
 });
 
-server.listen(3000);
+server.listen(3000, function(){
+    console.log('listening on *:3000');
+});

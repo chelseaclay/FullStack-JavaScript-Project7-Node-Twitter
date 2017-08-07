@@ -1,12 +1,13 @@
+//part of page that shows twitter timeline
 .grid-33
     .app--section
         ul.app--tweet--list
             if tweets
                 each tweet in tweets
                     li
-                        strong.app--tweet--timestamp 4h
+                        strong.app--tweet--timestamp= tweet.created_at
                         .app--tweet--author
-                            .app--avatar(style='background-image: url(' + tweet.user.profile_image_url + ')')
+                            .app--avatar(style='background-image: url(' + tweet.user.profile_image_url_https + ')')
                             h4= tweet.user.name
                             |  @#{tweet.user.screen_name}
                         p= tweet.text
