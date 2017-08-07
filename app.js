@@ -18,21 +18,14 @@ app.set('view engine', 'pug');
 
 
 const T = new Twit(config);
-
-let userName = "";
-let name = "";
-let profileImage = "";
-let myTweet = "";
-let retweets = "";
-let favourites = "";
+let userName;
+let name;
+let profileImage;
 let tweets;
 let friends;
 let messages;
-let friendsCount = "";
-let profile_banner_url ="";
-let date = function(date){
-    moment(date).format("YYYY/MM/DD");
-};
+let friendsCount;
+let profile_banner_url;
 
 function loadTweets() {
     T.get("friends/list", { screen_name: userName, count: 5 }, function(
@@ -41,11 +34,10 @@ function loadTweets() {
         response
     ) {
         if (err) {
-            // console.log(err);
+            console.log(err);
             throw err;
         } else {
             friends = data.users;
-            // console.log(data.users);
         }
     });
 
@@ -54,7 +46,6 @@ function loadTweets() {
             console.log(err);
         } else {
             messages = data;
-             //console.log(data);
         }
     });
 
@@ -67,12 +58,11 @@ function loadTweets() {
             console.log(err);
         } else {
             tweets = data;
-            // console.log(data);
         }
     });
 }
 
-    T.get('account/verify_credentials', { skip_status: true })
+T.get('account/verify_credentials', { skip_status: true })
         .catch(function (err) {
             console.log('caught error', err.stack)
         })
@@ -85,7 +75,7 @@ function loadTweets() {
             profile_banner_url = data.profile_banner_url;
             loadTweets();
 
-        });
+});
 
 io.on("connection", function(socket) {
     console.log("Client connected ...");
@@ -122,7 +112,6 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
     res.json(req.body)
-
 });
 
 server.listen(3000, function(){
