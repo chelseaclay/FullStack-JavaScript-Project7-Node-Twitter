@@ -1,0 +1,14 @@
+.grid-33
+    .app--section
+        ul.app--message--list
+            if messages
+                each message in messages
+                    li
+                        h3
+                            | Conversation with
+                            a  #{message.recipient.name}
+                        ul.app--message--conversation
+                            li.app--message
+                                .app--avatar(style='background-image: url(' + message.recipient.profile_image_url + ')')
+                                p.app--message--text= message.text
+                                p.app--message--timestamp= message.created_at
