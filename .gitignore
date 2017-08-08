@@ -2,4 +2,8 @@
 node_modules
 .DS_Store
 config.js
+<<<<<<< HEAD
 *.log
+=======
+*.log
+>>>>>>> master
