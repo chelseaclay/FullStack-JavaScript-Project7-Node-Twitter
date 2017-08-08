@@ -19,10 +19,11 @@ html(lang='en')
         //
           CSS
           ––––––––––––––––––––––––––––––––––––––––––––––––––
-        link(rel='stylesheet', href='/static/global.css')
+        link(rel='stylesheet', href='css/global.css')
         //
            JS
            ––––––––––––––––––––––––––––––––––––––––––––––––––
+        script(src='js/client.js')
         script(src='/socket.io/socket.io.js')
     body
         header.circle--header(style='background-image: url(' + profile_banner_url + ')')
@@ -43,3 +44,5 @@ html(lang='en')
                                 li
                                     a Sign Out
         block content
+
+

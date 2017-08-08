@@ -12,8 +12,7 @@ const io = require("socket.io")(server);
 app.locals.moment = require('moment');
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.use('/static', express.static('css'));
-app.use('/static-images', express.static('images'));
+app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'pug');
 
 
@@ -26,6 +25,22 @@ let friends;
 let messages;
 let friendsCount;
 let profile_banner_url;
+
+T.get('account/verify_credentials', { skip_status: true })
+    .catch(function (err) {
+        console.log('caught error', err.stack)
+    })
+    .then(function (result) {
+        let data = result.data;
+        userName = data.screen_name;
+        profileImage = data.profile_image_url;
+        name = data.name;
+        friendsCount = data.friends_count;
+        profile_banner_url = data.profile_banner_url;
+        loadTweets();
+
+    });
+
 
 function loadTweets() {
     T.get("friends/list", { screen_name: userName, count: 5 }, function(
@@ -62,36 +77,14 @@ function loadTweets() {
     });
 }
 
-T.get('account/verify_credentials', { skip_status: true })
-        .catch(function (err) {
-            console.log('caught error', err.stack)
-        })
-        .then(function (result) {
-            let data = result.data;
-            userName = data.screen_name;
-            profileImage = data.profile_image_url;
-            name = data.name;
-            friendsCount = data.friends_count;
-            profile_banner_url = data.profile_banner_url;
-            loadTweets();
 
-});
 
-io.on("connection", function(socket) {
-    console.log("Client connected ...");
-    socket.on("input", msg => {
-        T.post("statuses/update", { status: msg }, function(err, data, response) {
-            if (err) {
-                console.log(err);
-            }
-        });
-        setTimeout(function() {
-            loadTweets();
-        }, 3000);
+io.sockets.on('connection', function (socket) {
+    socket.emit('message', { message: 'welcome to the chat' });
+    socket.on('send', function (data) {
+        io.sockets.emit('message', data);
     });
 });
-
-
 
 
 app.get('/', (req, res) => {
