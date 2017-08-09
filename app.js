@@ -15,21 +15,15 @@ app.set('view engine', 'pug');
 
 
 const T = new Twit(config);
-let userName;
-let name;
-let profileImage;
-let tweets;
-let friends;
-let messages;
-let friendsCount;
-let profile_banner_url;
+const stream = T.stream('statuses/user_timeline');
+
 
 T.get('account/verify_credentials', { skip_status: true })
     .catch(function (err) {
-        console.log('caught error', err.stack)
+        console.log('caught error at getting credentials', err.stack)
     })
     .then(function (result) {
-        let data = result.data;
+        data = result.data;
         userName = data.screen_name;
         profileImage = data.profile_image_url;
         name = data.name;
@@ -38,6 +32,7 @@ T.get('account/verify_credentials', { skip_status: true })
         loadTweets();
 
     });
+
 
 
 function loadTweets() {
@@ -73,10 +68,13 @@ function loadTweets() {
 
 
 
-io.sockets.on('connection', function (socket) {
-    socket.emit('message', { message: 'welcome to the chat' });
-    socket.on('send', function (data) {
-        io.sockets.emit('message', data);
+io.on('connection', function (socket) {
+    console.log('connected ok');
+
+    socket.on('tweet', function (data) {
+        T.post('statuses/update', { status: 'hello world!' }, function(err, data, response) {
+            console.log(data)
+        });
     });
 });
 
