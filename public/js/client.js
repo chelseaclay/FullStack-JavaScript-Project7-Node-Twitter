@@ -1,8 +1,7 @@
 //connect socket to the server
 const socket = io.connect('http://localhost:3000');
-    var field = document.getElementById("field");
-    var sendButton = document.getElementsByClassName("button-primary");
-    var tweet = document.getElementById("tweet-textarea");
+const sendButton = document.getElementsByClassName("button-primary");
+const tweet = document.getElementById("tweet-textarea");
 
     socket.on('message', function (data) {
         if(data.message) {
@@ -19,7 +18,8 @@ const socket = io.connect('http://localhost:3000');
 
     sendButton.onclick = function(e) {
         e.preventDefault();
-        var text = field.value;
-        socket.emit('send', { message: text });
+        var tweet = tweet.value;
+        socket.emit('send', { message: tweet });
+        console.log(tweet);
     };
 

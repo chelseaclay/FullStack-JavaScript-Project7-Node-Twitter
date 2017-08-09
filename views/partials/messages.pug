@@ -12,5 +12,4 @@
                             li.app--message
                                 .app--avatar(style='background-image: url(' + message.recipient.profile_image_url + ')')
                                 p.app--message--text= message.text
-                                span.app--message--timestamp= moment(message.created_at).format("YYYY/MM/DD")
-                                |  #{moment(message.created_at).format("HH:mm")}
+                                span.app--message--timestamp= moment(message.created_at).format("DD/MM/YYYY, HH:mm")

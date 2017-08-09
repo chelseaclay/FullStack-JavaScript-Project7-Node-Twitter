@@ -4,8 +4,6 @@ const Twit = require('twit');
 const config = require("./config");
 const moment = require('moment');
 
-
-
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
@@ -43,11 +41,8 @@ T.get('account/verify_credentials', { skip_status: true })
 
 
 function loadTweets() {
-    T.get("friends/list", { screen_name: userName, count: 5 }, function(
-        err,
-        data,
-        response
-    ) {
+    T.get("friends/list", { screen_name: userName, count: 5 },
+        function(err, data, response) {
         if (err) {
             console.log(err);
             throw err;
@@ -59,18 +54,17 @@ function loadTweets() {
     T.get("direct_messages/sent", { count: 5 }, function(err, data, response) {
         if (err) {
             console.log(err);
+            throw err;
         } else {
             messages = data;
         }
     });
 
-    T.get("statuses/user_timeline", { screen_name: userName, count: 5 }, function(
-        err,
-        data,
-        response
-    ) {
+    T.get("statuses/user_timeline", { screen_name: userName, count: 5 },
+        function(err, data, response) {
         if (err) {
             console.log(err);
+            throw err;
         } else {
             tweets = data;
         }
@@ -87,20 +81,19 @@ io.sockets.on('connection', function (socket) {
 });
 
 
-app.get('/', (req, res) => {
+app.get('/', (req, res, next) => {
     res.render('index', {
-        userName: userName,
-        profileImage: profileImage,
-        name: name,
-        friendsCount: friendsCount,
-        tweets: tweets,
-        friends: friends,
-        messages: messages,
-        profile_banner_url: profile_banner_url
+        userName,
+        profileImage,
+        name,
+        friendsCount,
+        tweets,
+        friends,
+        messages,
+        profile_banner_url
     });
+    next();
 });
-
-
 
 
 app.post('/', (req, res) => {
