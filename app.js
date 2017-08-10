@@ -15,6 +15,15 @@ app.set('view engine', 'pug');
 
 
 const T = new Twit(config);
+let tweets;
+let friends;
+let userName;
+let profileImage;
+let name;
+let friendsCount;
+let profile_banner_url;
+let messages;
+
 const stream = T.stream('statuses/user_timeline');
 
 
@@ -23,7 +32,7 @@ T.get('account/verify_credentials', { skip_status: true })
         console.log('caught error at getting credentials', err.stack)
     })
     .then(function (result) {
-        data = result.data;
+        let data = result.data;
         userName = data.screen_name;
         profileImage = data.profile_image_url;
         name = data.name;
@@ -66,19 +75,6 @@ function loadTweets() {
     });
 }
 
-
-
-io.on('connection', function (socket) {
-    console.log('connected ok');
-
-    socket.on('tweet', function (data) {
-        T.post('statuses/update', { status: 'hello world!' }, function(err, data, response) {
-            console.log(data)
-        });
-    });
-});
-
-
 app.get('/', (req, res, next) => {
     res.render('index', {
         userName,
@@ -94,9 +90,26 @@ app.get('/', (req, res, next) => {
 });
 
 
+
 app.post('/', (req, res) => {
-    res.json(req.body)
+    res.send(req.body);
+
+    //console.log(req.body)
+    io.on('connection', function (socket) {
+        console.log('connected ok');
+
+        stream.on('tweet', function (tweet) {
+            console.log(tweet); //this is the textarea.value
+        });
+        //req.body.tweet is the value of the textarea
+        T.post('statuses/update', { status: req.body.tweet }, function(err, data, response) {
+            console.log(data); //this is what is sent to twitter
+        })
+    });
+
 });
+
+
 
 server.listen(3000, function(){
     console.log('listening on *:3000');

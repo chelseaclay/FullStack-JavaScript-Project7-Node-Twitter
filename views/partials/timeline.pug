@@ -5,7 +5,8 @@
             if tweets
                 each tweet in tweets
                     li
-                        strong.app--tweet--timestamp= moment(tweet.created_at).format("DD/MM/YYYY, HH:mm")
+                        strong.app--tweet--timestamp= moment(tweet.created_at, "ddd MMM HH:mm:ss Z YYYY").format("DD/MM/YYYY, HH:mm")
+
                         .app--tweet--author
                             .app--avatar(style='background-image: url(' + tweet.user.profile_image_url_https + ')')
                             h4= tweet.user.name
