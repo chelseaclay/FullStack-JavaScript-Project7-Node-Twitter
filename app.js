@@ -7,6 +7,7 @@ const moment = require('moment');
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
+//let sockets = [];
 app.locals.moment = require('moment');
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -24,7 +25,7 @@ let friendsCount;
 let profile_banner_url;
 let messages;
 
-const stream = T.stream('statuses/user_timeline');
+
 
 
 const getCredentials =  (req, res, next) =>{
@@ -103,7 +104,25 @@ app.get('/', (req, res, next) => {
 
 io.on('connection', function (socket) {
     console.log('connected ok');
+    //sockets.push(socket);
+    socket.send('message to client');
+    const stream = T.stream('statuses/user_timeline');
+    stream.on('tweet', function (tweet) {
+        console.log(tweet); //this is the textarea.value
 
+        //console.log(sockets);
+        socket.send(tweet);
+    });
+    io.on('message', function(data){
+        const myTweet = req.body.tweet;
+        T.post('statuses/update', { status: myTweet}, function(err, data, response) {
+            //console.log(data); //this is what is sent to twitter
+            //console.log(myTweet);
+            if (err) {
+                console.log(err);
+            }
+        });
+    });
 });
 
 app.post('/', (req, res) => {
@@ -112,19 +131,14 @@ app.post('/', (req, res) => {
     if(!myTweet || myTweet === ''){
         res.end()
     }
-    stream.on('tweet', function (tweet) {
-        console.log(tweet); //this is the textarea.value
-
-    });
 
     T.post('statuses/update', { status: myTweet}, function(err, data, response) {
-        console.log(data); //this is what is sent to twitter
-        console.log(myTweet);
+        //console.log(data); //this is what is sent to twitter
+        //console.log(myTweet);
         if (err) {
             console.log(err);
         }
     });
-
 
     //res.send(req.body);
     //console.log(req.body)

@@ -1,12 +1,22 @@
 //connect socket to the server
 const socket = io.connect('http://localhost:3000');
 const sendButton = document.getElementsByClassName("button-primary");
+const form = document.getElementsByTagName('form');
 const tweet = document.getElementById("tweet-textarea");
 const tweetList = document.getElementsByClassName("app--tweet--list");
 
-socket.on('tweet', function(data) {
+/*
+form.onclick = function(e){
+    e.preventDefault();
+    socket.send(tweet.value);
+
+};
+*/
+
+socket.on('message', function(data) {
     console.log('ok back from client');
-    sendButton.onclick = function (e) {
+    console.log(data);
+    form.onclick = function (e) {
         e.preventDefault();
         console.log('this worked');
         console.log(tweet.value);
@@ -57,10 +67,10 @@ socket.on('tweet', function(data) {
               </li>
             </ul>
           </li>`;
-
+        tweetList.append(newTweet);
+        console.log(newTweet);
     };
-    tweetList.append(newTweet);
-    console.log(newTweet);
+
 
 });
 
