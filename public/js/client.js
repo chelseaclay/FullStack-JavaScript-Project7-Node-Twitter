@@ -17,7 +17,7 @@ socket.on('tweet', function(data) {
               <div class="app--avatar" style="background-image: url(images/f-spore.png)">
                 <img src="images/f-spore.png" />
               </div>
-              <h4>Jill Spore</h4> @jillspore
+              <h4>${name}</h4> @${userName}
             </a>
             <p>${tweet.value}</p>
             <ul class="app--tweet--actions circle--list--inline">
@@ -57,9 +57,10 @@ socket.on('tweet', function(data) {
               </li>
             </ul>
           </li>`;
-        tweetList.append(newTweet);
-    };
 
+    };
+    tweetList.append(newTweet);
+    console.log(newTweet);
 
 });
 

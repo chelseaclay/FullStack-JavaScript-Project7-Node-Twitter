@@ -89,26 +89,47 @@ app.get('/', (req, res, next) => {
     next();
 });
 
-
-
-app.post('/', (req, res) => {
-    res.send(req.body);
-
-    //console.log(req.body)
-    io.on('connection', function (socket) {
-        console.log('connected ok');
-
-        stream.on('tweet', function (tweet) {
-            console.log(tweet); //this is the textarea.value
-        });
-        //req.body.tweet is the value of the textarea
-        T.post('statuses/update', { status: req.body.tweet }, function(err, data, response) {
-            console.log(data); //this is what is sent to twitter
-        })
-    });
+io.on('connection', function (socket) {
+    console.log('connected ok');
 
 });
 
+app.post('/', (req, res) => {
+    //req.body.tweet is the value of the textarea
+    const myTweet = req.body.tweet;
+    if(!myTweet || myTweet === ''){
+        res.end()
+    }
+    stream.on('tweet', function (tweet) {
+        console.log(tweet); //this is the textarea.value
+
+    });
+
+    T.post('statuses/update', { status: myTweet}, function(err, data, response) {
+        console.log(data); //this is what is sent to twitter
+        console.log(myTweet);
+        if (err) {
+            console.log(err);
+        }
+
+    });
+
+
+    //res.send(req.body);
+    //console.log(req.body)
+});
+app.post('/', (req, res) => {
+    res.render('index', {
+        userName,
+        profileImage,
+        name,
+        friendsCount,
+        tweets,
+        friends,
+        messages,
+        profile_banner_url,
+    });
+});
 
 
 server.listen(3000, function(){
