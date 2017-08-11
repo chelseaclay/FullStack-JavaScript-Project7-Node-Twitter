@@ -27,34 +27,49 @@ let messages;
 const stream = T.stream('statuses/user_timeline');
 
 
-T.get('account/verify_credentials', { skip_status: true })
-    .catch(function (err) {
-        console.log('caught error at getting credentials', err.stack)
-    })
-    .then(function (result) {
-        let data = result.data;
-        userName = data.screen_name;
-        profileImage = data.profile_image_url;
-        name = data.name;
-        friendsCount = data.friends_count;
-        profile_banner_url = data.profile_banner_url;
-        loadTweets();
+const getCredentials =  (req, res, next) =>{
+    T.get('account/verify_credentials', { skip_status: true })
+        .catch(function (err) {
+            console.log('caught error at getting credentials', err.stack)
+        })
+        .then(function (result) {
+            let data = result.data;
+            userName = data.screen_name;
+            profileImage = data.profile_image_url;
+            name = data.name;
+            friendsCount = data.friends_count;
+            profile_banner_url = data.profile_banner_url;
+        });
+    next();
+};
+const getTimeline = (req, res, next) => {
+    T.get("statuses/user_timeline", { screen_name: userName, count: 5 },
+        function(err, data, response) {
+            if (err) {
+                console.log(err);
+                throw err;
+            } else {
+                tweets = data;
+            }
 
-    });
+        });
+    next();
+};
 
-
-
-function loadTweets() {
+const getFriends = (req, res, next) => {
     T.get("friends/list", { screen_name: userName, count: 5 },
         function(err, data, response) {
-        if (err) {
-            console.log(err);
-            throw err;
-        } else {
-            friends = data.users;
-        }
-    });
+            if (err) {
+                console.log(err);
+                throw err;
+            } else {
+                friends = data.users;
+            }
+        });
+    next();
+};
 
+const getMessages = (req, res, next) => {
     T.get("direct_messages/sent", { count: 5 }, function(err, data, response) {
         if (err) {
             console.log(err);
@@ -63,17 +78,12 @@ function loadTweets() {
             messages = data;
         }
     });
+    next();
+};
 
-    T.get("statuses/user_timeline", { screen_name: userName, count: 5 },
-        function(err, data, response) {
-        if (err) {
-            console.log(err);
-            throw err;
-        } else {
-            tweets = data;
-        }
-    });
-}
+
+app.use(getCredentials);
+app.get('/', getTimeline, getFriends, getMessages);
 
 app.get('/', (req, res, next) => {
     res.render('index', {
@@ -86,8 +96,10 @@ app.get('/', (req, res, next) => {
         messages,
         profile_banner_url
     });
-    next();
+
 });
+
+
 
 io.on('connection', function (socket) {
     console.log('connected ok');
@@ -111,7 +123,6 @@ app.post('/', (req, res) => {
         if (err) {
             console.log(err);
         }
-
     });
 
 
@@ -131,6 +142,18 @@ app.post('/', (req, res) => {
     });
 });
 
+
+
+app.use((req, res, next) => {
+    let err = new Error('OOOPPPPS Looks like that page doesn\'t exist');
+    err.status = 404;
+    next(err);
+});
+app.use((err, req, res, next) =>{
+    res.locals.error = err;
+    res.status(err.status);
+    res.render('error');
+});
 
 server.listen(3000, function(){
     console.log('listening on *:3000');
