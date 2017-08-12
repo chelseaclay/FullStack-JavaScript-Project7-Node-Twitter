@@ -82,53 +82,24 @@ app.get('/', (req, res, next) => {
         messages: req.messages,
         profile_banner_url: req.profile_banner_url
     });
+    io.on('connection', function (socket) {
+        socket.emit('sendUserName', req.userName);
+        socket.emit('sendName', req.name);
+        socket.emit('sendProfileImage', req.profileImage);
+    });
 });
 
 
-
 io.on('connection', function (socket) {
-    console.log('connected ok');
-    //sockets.push(socket);
-    socket.send('message to client');
-    const stream = T.stream('statuses/user_timeline');
-    stream.on('tweet', function (tweet) {
-        console.log(tweet); //this is the textarea.value
-
-        //console.log(sockets);
-        socket.send(tweet);
-    });
-    io.on('message', function(data){
-        const myTweet = req.body.tweet;
-        T.post('statuses/update', { status: myTweet}, function(err, data, response) {
-            //console.log(data); //this is what is sent to twitter
-            //console.log(myTweet);
+    socket.on('message', function(newTweetValue){
+        console.log(newTweetValue);
+        T.post('statuses/update', { status: newTweetValue}, function(err, data, response) {
             if (err) {
                 console.log(err);
             }
         });
     });
 });
-
-app.post('/', (req, res) => {
-    //req.body.tweet is the value of the textarea
-    const myTweet = req.body.tweet;
-    if(!myTweet || myTweet === ''){
-        res.end()
-    }
-
-    T.post('statuses/update', { status: myTweet}, function(err, data, response) {
-        //console.log(data); //this is what is sent to twitter
-        //console.log(myTweet);
-        if (err) {
-            console.log(err);
-        }
-    });
-
-    //res.send(req.body);
-    //console.log(req.body)
-});
-
-
 
 
 app.use((req, res, next) => {

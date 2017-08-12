@@ -1,35 +1,31 @@
 //connect socket to the server
 const socket = io.connect('http://localhost:3000');
-const sendButton = document.getElementsByClassName("button-primary");
-const form = document.getElementsByTagName('form');
-const tweet = document.getElementById("tweet-textarea");
-const tweetList = document.getElementsByClassName("app--tweet--list");
 
-/*
-form.onclick = function(e){
-    e.preventDefault();
-    socket.send(tweet.value);
+socket.on('sendUserName', function(userName){
+    socket.userName = userName;
+});
+socket.on('sendName', function(name){
+    socket.name = name;
+});
+socket.on('sendProfileImage', function(profileImage){
+    socket.profileImage = profileImage;
+});
 
-};
-*/
-
-socket.on('message', function(data) {
-    console.log('ok back from client');
-    console.log(data);
-    form.onclick = function (e) {
-        e.preventDefault();
-        console.log('this worked');
-        console.log(tweet.value);
+$(".button-primary").click(() => {
+        event.preventDefault();
+        let newTweetValue = $("#tweet-textarea").val();
+        //this sends the new message to the socket in app.js which then posts it to twitter
+        socket.emit('message', newTweetValue);
 
         const newTweet = `<li>
-            <strong class="app--tweet--timestamp">4h</strong>
+            <strong class="app--tweet--timestamp">Now</strong>
             <a class="app--tweet--author">
-              <div class="app--avatar" style="background-image: url(images/f-spore.png)">
+              <div class="app--avatar" style="background-image: url(' ${socket.profileImage}')">
                 <img src="images/f-spore.png" />
               </div>
-              <h4>${name}</h4> @${userName}
+              <h4>${socket.name}</h4> @${socket.userName}
             </a>
-            <p>${tweet.value}</p>
+            <p>${newTweetValue}</p>
             <ul class="app--tweet--actions circle--list--inline">
               <li>
                 <a class="app--reply">
@@ -52,7 +48,7 @@ socket.on('message', function(data) {
                     h-4.7c-1.1,0-2.2,0.7-2.6,1.7c-0.4,1-0.2,2.3,0.6,3.1l7.5,7.5c0.5,0.5,1.3,0.8,2,0.8c0.7,0,1.4-0.3,2-0.8l7.5-7.5
                     C50,18.9,50.2,17.7,49.8,16.7z"/>
                   </svg>
-                  <strong>75</strong>
+                  <strong>0</strong>
                 </a>
               </li>
               <li>
@@ -62,15 +58,13 @@ socket.on('message', function(data) {
                     <path class="st0" d="M25.8,0c-3.6,0-6.8,2.1-8.3,5.1C16,2.1,12.9,0,9.2,0C4.1,0,0,4.1,0,9.2C0,21.4,17.3,28,17.3,28S35,21.3,35,9.2
                     C35,4.1,30.9,0,25.8,0L25.8,0z"/>
                   </svg>
-                  <strong>12</strong>
+                  <strong>0</strong>
                 </a>
               </li>
             </ul>
           </li>`;
-        tweetList.append(newTweet);
-        console.log(newTweet);
-    };
+        $(".app--tweet--list").prepend(newTweet);
+        $("#tweet-textarea").val('');
+    });
 
-
-});
 
