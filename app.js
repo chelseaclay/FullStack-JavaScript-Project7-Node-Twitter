@@ -7,7 +7,6 @@ const moment = require('moment');
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
-//let sockets = [];
 app.locals.moment = require('moment');
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -16,17 +15,6 @@ app.set('view engine', 'pug');
 
 
 const T = new Twit(config);
-let tweets;
-let friends;
-let userName;
-let profileImage;
-let name;
-let friendsCount;
-let profile_banner_url;
-let messages;
-
-
-
 
 const getCredentials =  (req, res, next) =>{
     T.get('account/verify_credentials', { skip_status: true })
@@ -35,69 +23,65 @@ const getCredentials =  (req, res, next) =>{
         })
         .then(function (result) {
             let data = result.data;
-            userName = data.screen_name;
-            profileImage = data.profile_image_url;
-            name = data.name;
-            friendsCount = data.friends_count;
-            profile_banner_url = data.profile_banner_url;
+            req.userName = data.screen_name;
+            req.profileImage = data.profile_image_url;
+            req.name = data.name;
+            req.friendsCount = data.friends_count;
+            req.profile_banner_url = data.profile_banner_url;
         });
-    next();
+    setTimeout(next, 1000);
 };
 const getTimeline = (req, res, next) => {
-    T.get("statuses/user_timeline", { screen_name: userName, count: 5 },
+    T.get("statuses/user_timeline", { screen_name: req.userName, count: 5 },
         function(err, data, response) {
             if (err) {
                 console.log(err);
                 throw err;
             } else {
-                tweets = data;
+                req.tweets = data;
             }
 
         });
-    next();
+    setTimeout(next, 1000);
 };
-
 const getFriends = (req, res, next) => {
-    T.get("friends/list", { screen_name: userName, count: 5 },
+    T.get("friends/list", { screen_name: req.userName, count: 5 },
         function(err, data, response) {
             if (err) {
                 console.log(err);
                 throw err;
             } else {
-                friends = data.users;
+                req.friends = data.users;
             }
         });
-    next();
+    setTimeout(next, 1000);
 };
-
 const getMessages = (req, res, next) => {
     T.get("direct_messages/sent", { count: 5 }, function(err, data, response) {
         if (err) {
             console.log(err);
             throw err;
         } else {
-            messages = data;
+            req.messages = data;
         }
     });
-    next();
+    setTimeout(next, 1000);
 };
 
+app.use(getCredentials, getTimeline, getFriends, getMessages);
 
-app.use(getCredentials);
-app.get('/', getTimeline, getFriends, getMessages);
 
 app.get('/', (req, res, next) => {
     res.render('index', {
-        userName,
-        profileImage,
-        name,
-        friendsCount,
-        tweets,
-        friends,
-        messages,
-        profile_banner_url
+        userName: req.userName,
+        profileImage: req.profileImage,
+        name: req.name,
+        friendsCount: req.friendsCount,
+        tweets: req.tweets,
+        friends: req.friends,
+        messages: req.messages,
+        profile_banner_url: req.profile_banner_url
     });
-
 });
 
 
@@ -143,18 +127,7 @@ app.post('/', (req, res) => {
     //res.send(req.body);
     //console.log(req.body)
 });
-app.post('/', (req, res) => {
-    res.render('index', {
-        userName,
-        profileImage,
-        name,
-        friendsCount,
-        tweets,
-        friends,
-        messages,
-        profile_banner_url,
-    });
-});
+
 
 
 
