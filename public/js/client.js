@@ -1,23 +1,43 @@
-//connect socket to the server
+/*---------------------------------------------------------------------
+ connect socket to the server
+ ---------------------------------------------------------------------*/
 const socket = io.connect('http://localhost:3000');
-
-socket.on('sendUserName', function(userName){
+/*---------------------------------------------------------------------
+ sockets used to pass the message of the username name and profile image
+ so that they can be appended right away to the site after tweet sent
+ ---------------------------------------------------------------------*/
+socket.on('sendUserName', function (userName) {
     socket.userName = userName;
 });
-socket.on('sendName', function(name){
+socket.on('sendName', function (name) {
     socket.name = name;
 });
-socket.on('sendProfileImage', function(profileImage){
+socket.on('sendProfileImage', function (profileImage) {
     socket.profileImage = profileImage;
 });
 
-$(".button-primary").click(() => {
-        event.preventDefault();
-        let newTweetValue = $("#tweet-textarea").val();
-        //this sends the new message to the socket in app.js which then posts it to twitter
-        socket.emit('message', newTweetValue);
+/*---------------------------------------------------------------------
+ calculate the remaining characters left and append that number to the textarea
+ ---------------------------------------------------------------------*/
+$("#tweet-textarea").keydown(() => {
+    let maxCharacters = 140 - $("#tweet-textarea").val().length;
+    $("#tweet-char").text(maxCharacters);
+    console.log($("#tweet-textarea").val().length)
+});
 
-        const newTweet = `<li>
+/*---------------------------------------------------------------------
+ on click of button get the tweet value
+ check to see if it is less than or equal to 140 characters and not empty
+ if it is append the new tweet to the timeline
+ then set the textarea value to zero
+ then send a message using socket of the value so that it can be tweeted
+ from the app.js file
+ ---------------------------------------------------------------------*/
+$(".button-primary").click(() => {
+    event.preventDefault();
+    let newTweetValue = $("#tweet-textarea").val();
+
+    const newTweet = `<li>
             <strong class="app--tweet--timestamp">Now</strong>
             <a class="app--tweet--author">
               <div class="app--avatar" style="background-image: url(' ${socket.profileImage}')">
@@ -63,8 +83,19 @@ $(".button-primary").click(() => {
               </li>
             </ul>
           </li>`;
-        $(".app--tweet--list").prepend(newTweet);
-        $("#tweet-textarea").val('');
-    });
 
+    if (newTweetValue !== '') {
+        if ($("#tweet-textarea").val().length <= 140) {
+            $(".app--tweet--list").prepend(newTweet);
+            $("#tweet-textarea").val('');
+            socket.emit('message', newTweetValue);
 
+        } else {
+            alert('oops your tweet is too long max 140 characters')
+        }
+
+    } else if (newTweetValue === '') {
+        $("#tweet-textarea").attr("placeholder", "Please type your tweet here");
+    }
+
+});
